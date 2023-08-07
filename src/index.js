@@ -1,55 +1,45 @@
 module.exports = function check(str, bracketsConfig) {
-  let f_arr = [], s_arr = [], dublicate = [], arr = [];
-  let d_count = 0, s_count = 0, s_count_f = 0;
-
-  let open_brackets = [], close_brackets = [], f_index = [], s_index = [];
-
+  let open_brackets = [], open_brackets_index = [], close_brackets = [], close_brackets_index = [], open_bracketsConfig = [], close_bracketsConfig = [], res, res_arr = [];
+  let arr = str.split('');
   bracketsConfig.forEach(item => {
     for(let i = 0; i < item.length; i++) {
-      i % 2 == 0 ? open_brackets.push(item[i]) : close_brackets.push(item[i]);
+      i % 2 == 0 ? open_bracketsConfig.push(item[i]) : close_bracketsConfig.push(item[i]);
     }
   });
 
-  for(let i = 0; i < open_brackets.length; i++) {
-    if(open_brackets[i] == close_brackets[i]) {
-      dublicate.push(open_brackets[i]);
-    }
-  }
-
-  for(let i = 0; i < str.length; i++) {
-    if(dublicate.includes(str[i])) {
-      d_count++;
-    }
-  }
-
-  str = str.split('');
-  for(let i = 0; i < str.length; i++) {
-    if(open_brackets.includes(str[i])) {
-      arr.push(str[i]);
-      f_arr.push(str[i]);
-    }
-    if(close_brackets.includes(str[i])) {
-      f_index = arr.pop();
-      s_arr.push(str[i]);
-      if(open_brackets.indexOf(f_index) != close_brackets.indexOf(str[i])) {
-        return false;
+  for(let i = 0; i < arr.length; i++) {
+    open_bracketsConfig.forEach(open => {
+      if(arr[i] === open) {
+        open_brackets.push(arr[i]);
       }
+    })
+    close_bracketsConfig.forEach(close => {
+      if(arr[i] === close) {
+        close_brackets.push(arr[i]);
+      }
+    })
+  }
+
+  let count = 1;
+
+  for(let i = 0; i < arr.length; i++) {
+    open_brackets.forEach(bracket => {
+      if(arr[i] === bracket) {
+        res_arr.push(bracket);
+      }
+      else {
+        if(JSON.stringify(bracketsConfig).includes(JSON.stringify([res_arr[res_arr.length-1], arr[i]]))){
+          res_arr.pop();
+        }
+      }
+    })
+  }
+
+  for(let i = 1; i < res_arr.length; i++) {
+    if(res_arr.includes(res_arr[0]) && res_arr[0] !== '(') {
+      count++;
     }
   }
 
-  for(let i = 0; i < s_arr.length; i++) {
-    if(dublicate[0] == (s_arr[i])) {
-      s_count_f++;
-    }
-    if(dublicate[1] == (s_arr[i])) {
-      s_count++;
-    }
-  }
-
-  if(s_count != s_count_f && s_count != 0) {
-    return false;
-  }
-  
-
-  return !arr.length;
+  return (res_arr.length == 0 || count % 2 == 0) ? true : false;
 }
